@@ -14,7 +14,9 @@ after_success:
   - git clone git@github.com:KeikaChan/prichan-items-scraper.git
   - cd ./prichan-items-scraper
   - mv ../`date '+%Y_%m_%d'`.csv ./csv
+  - mv ../items_url ./
   - git add csv
+  - git add items_url
   - git commit -m "Travis Auto Update $TRAVIS_JOB_NUMBER https://travis-ci.org/great-h/great-h.github.io/builds/$TRAVIS_BUILD_ID"
   - git push origin master
 branches:
