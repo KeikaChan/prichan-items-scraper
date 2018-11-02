@@ -21,7 +21,7 @@ class ItemsSpider(scrapy.Spider):
         series_links = response.css('.items-nav a::attr(href)').extract()
         series_names = response.css('.items-nav li ::text').extract()
         name_with_ruby = re.sub(r"^[ \r\n]+", "", re.sub(r"[\r\t　]+", "", " ".join(
-            series_names)), flags=(re.MULTILINE | re.DOTALL)).splitlines() # タブが入ったものが大量に取れてしまうためにそれを正規表現で削除
+            series_names)), flags=(re.MULTILINE | re.DOTALL)).splitlines()  # タブが入ったものが大量に取れてしまうためにそれを正規表現で削除
         names = []
         for item in name_with_ruby:
             names.append("".join(re.sub("だい|だん|げんてい|きかん|ねん|がつ",
@@ -42,8 +42,12 @@ class ItemsSpider(scrapy.Spider):
         for index in range(len(series_links)):
             url = response.urljoin(series_links[index])
             if url.find("robots.txt") == -1:
-                dan = names[index]
-                yield scrapy.Request(url=url, callback=self.parse_series, meta={"number": dan})  # データの受け渡し、クロールする
+                if url.count("promotion"):
+                    dan = "プロモーション" + names[index]
+                else:
+                    dan = names[index]
+                # データの受け渡し、クロールする
+                yield scrapy.Request(url=url, callback=self.parse_series, meta={"number": dan})
 
     def parse_series(self, response):
         """各シリーズページ全体をパースする"""
