@@ -3,6 +3,9 @@ python:
   - "3.7-dev"
 install:
   - pip install scrapy requests zenhan scrapy_splash
+before_script:
+  - echo 'Asia/Tokyo' | sudo tee /etc/timezone
+  - sudo dpkg-reconfigure --frontend noninteractive tzdata
 script:
   - scrapy crawl items -t csv -o - > ./`date '+%Y_%m_%d'`.csv
   - echo https://raw.githubusercontent.com/KeikaChan/prichan-items-scraper/master/csv/`date '+%Y_%m_%d'`.csv > items_url
@@ -19,7 +22,7 @@ after_success:
   - mv ../items_url ./
   - git add csv
   - git add items_url
-  - git commit -m "Travis Auto Update $TRAVIS_JOB_NUMBER https://travis-ci.org/KeikaChan/prichan-items-scraper/builds/$TRAVIS_BUILD_ID" [skip ci]
+  - git commit -m "Travis Auto Update $TRAVIS_JOB_NUMBER https://travis-ci.org/KeikaChan/prichan-items-scraper/builds/$TRAVIS_BUILD_ID [skip ci]"
   - git push origin master
 branches:
   only:
