@@ -4,17 +4,19 @@ python:
 install:
   - pip install scrapy requests zenhan scrapy_splash
 script:
-  - [ -e ./csv/`date  '+%Y_%m_%d'`.csv ] && rm ./csv/`date  '+%Y_%m_%d'`.csv
-  - scrapy crawl items -o ./csv/`date '+%Y_%m_%d'`.csv
+  - scrapy crawl items -t csv -o - > ./`date '+%Y_%m_%d'`.csv
   - echo https://raw.githubusercontent.com/KeikaChan/prichan-items-scraper/master/csv/`date '+%Y_%m_%d'`.csv > items_url
 after_success:
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\nIdentityFile ~/.ssh/deploy.key\n" >> ~/.ssh/config
   - openssl aes-256-cbc -k "$SERVER_KEY" -in .travis/deploy_key.enc -d -a -out deploy.key
-  - cp deploy.key ~/.ssh/
+  - mv deploy.key ~/.ssh/
   - chmod 600 ~/.ssh/deploy.key
-  - git add --all
-  - 'git commit -m "Travis Auto Update $TRAVIS_JOB_NUMBER https://travis-ci.org/great-h/great-h.github.io/builds/$TRAVIS_BUILD_ID"'
-  - git push origin master'
+  - git clone git@github.com:KeikaChan/prichan-items-scraper.git
+  - cd ./prichan-items-scraper
+  - mv ../`date '+%Y_%m_%d'`.csv ./csv
+  - git add csv
+  - git commit -m "Travis Auto Update $TRAVIS_JOB_NUMBER https://travis-ci.org/great-h/great-h.github.io/builds/$TRAVIS_BUILD_ID"
+  - git push origin master
 branches:
   only:
     - master
