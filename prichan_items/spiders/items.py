@@ -43,7 +43,6 @@ class ItemsSpider(scrapy.Spider):
             url = response.urljoin(series_links[index])
             if url.find("robots.txt") == -1:
                 dan = names[index]
-                print(dan)
                 yield scrapy.Request(url=url, callback=self.parse_series, meta={"number": dan})  # データの受け渡し、クロールする
 
     def parse_series(self, response):
