@@ -11,6 +11,8 @@ after_success:
   - openssl aes-256-cbc -k "$SERVER_KEY" -in .travis/deploy_key.enc -d -a -out deploy.key
   - mv deploy.key ~/.ssh/
   - chmod 600 ~/.ssh/deploy.key
+  - git config --global user.email "devs@outlook.jp"
+  - git config --global user.name "Khromium"
   - git clone git@github.com:KeikaChan/prichan-items-scraper.git
   - cd ./prichan-items-scraper
   - mv ../`date '+%Y_%m_%d'`.csv ./csv
