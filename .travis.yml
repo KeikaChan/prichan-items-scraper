@@ -19,7 +19,7 @@ after_success:
   - mv ../items_url ./
   - git add csv
   - git add items_url
-  - git commit -m "Travis Auto Update $TRAVIS_JOB_NUMBER https://travis-ci.org/great-h/great-h.github.io/builds/$TRAVIS_BUILD_ID"
+  - git commit -m "Travis Auto Update $TRAVIS_JOB_NUMBER https://travis-ci.org/KeikaChan/prichan-items-scraper/builds/$TRAVIS_BUILD_ID"
   - git push origin master
 branches:
   only:
