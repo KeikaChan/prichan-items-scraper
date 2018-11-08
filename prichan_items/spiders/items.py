@@ -25,7 +25,7 @@ class ItemsSpider(scrapy.Spider):
             series_names)), flags=(re.MULTILINE | re.DOTALL)).splitlines()  # タブが入ったものが大量に取れてしまうためにそれを正規表現で削除
         names = []
         for item in name_with_ruby:
-            names.append("".join(re.sub("だい|だん|げんてい|きかん|ねん|がつ",
+            names.append("".join(re.sub("だい|だん|げんてい|きかん|ねん|がつ|ふくぶくろ",
                                         "", item, flags=(re.DOTALL)).split()))  # 正規表現でルビを削除
         # リストの内容が重複することがあるらしいので削除
         names = list(OrderedDict.fromkeys(names))

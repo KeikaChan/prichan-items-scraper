@@ -8,22 +8,35 @@ before_script:
   - sudo dpkg-reconfigure --frontend noninteractive tzdata
 script:
   - scrapy crawl items -t csv -o - > ./`date '+%Y_%m_%d'`.csv
-  - echo https://raw.githubusercontent.com/KeikaChan/prichan-items-scraper/master/csv/`date '+%Y_%m_%d'`.csv > items_url
-after_success:
+  - echo https://github.com/KeikaChan/prichan-items-scraper/releases/download/$TRAVIS_JOB_NUMBER/items.csv > items_url
+before_deploy:
+  - export TRAVIS_TAG=$TRAVIS_JOB_NUMBER 
+  - export RELEASE_TITLE="Travis Auto Update $(date '+%Y%m%d%H%M%S')-$TRAVIS_JOB_NUMBER"
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\nIdentityFile ~/.ssh/deploy.key\n" >> ~/.ssh/config
   - openssl aes-256-cbc -k "$SERVER_KEY" -in .travis/deploy_key.enc -d -a -out deploy.key
   - mv deploy.key ~/.ssh/
   - chmod 600 ~/.ssh/deploy.key
   - git config --global user.email "devs@outlook.jp"
-  - git config --global user.name "Khromium"
+  - git config --global user.name "keykachan"
   - git clone git@github.com:KeikaChan/prichan-items-scraper.git
   - cd ./prichan-items-scraper
-  - mv ../`date '+%Y_%m_%d'`.csv ./csv
   - mv ../items_url ./
-  - git add csv
+  - mv ../`date '+%Y_%m_%d'`.csv ../items.csv
   - git add items_url
+  - git tag -a $TRAVIS_JOB_NUMBER -m "result of $TRAVIS_JOB_NUMBER"
   - git commit -m "Travis Auto Update $TRAVIS_JOB_NUMBER https://travis-ci.org/KeikaChan/prichan-items-scraper/builds/$TRAVIS_BUILD_ID [skip ci]"
-  - git push origin master
+  - git push origin master --tags
+  - cd ../
+deploy:
+  provider: releases
+  name: $RELEASE_TITLE
+  skip_cleanup: true
+  api_key:
+    secure: "NbvMVNzUztz5v2RO5zwek27sepRC40elOYDvgJI4qq2Jd6Q+DZjYkedSbDJGZfIefpCxMn9VKai+LCC+DvvUb4AHAiH5HyYj2lxJCrezOINxsly6Xethvo2tqAO35VQoydGiyYKxjU1Vit2hj7x2LPyK55B4LFwQafRqIdu2q5wbyMhjc/ID/5QI3CyBt4ZaLnSpc3jA/KXoy4+JdDF+LrcEOq0PaSDYmQizRu2mreekKzqpnS4KRrdZbTjovj5n9tnSCoJ3DEWMjWzxTeru/I3A/h/rYE0+F03D79esuF5X/D6xqF4+cqD9CO1z1nhehRfvqpWUQQSgKpxl8dj6/HNYoxuu+rDG2MjZBwfsh+xOZ+J3UDTnId7cGdqBeprLb7V+/7Nd8oqhdWUBJIUfl5F8i4E2GDVuH90YkFZq+twxehYC77Y0Rnevjrw5fINsknV1hpq6rvE8/0Qrphv9xINOa3CpW2F01DE/4/x+0B4t455KzfP0ZPlorwmCOQ7oeTDvneTWGMfs21Vwuul9C70cz28ulc41ybJyMK7ZP5rr8rm7AB1Ya2GbngopkZIu1BWKWkMBgzuS45rmbsg5o58XYPbhRk7MYzUcuLFVWT4mzdgKwOWKy0WN5TYigW2yOcOfsDsPSGa4qhlwa0vMtuRraPHE3QjmMTPwQ1cTNeM="
+  file:
+    - items.csv
+  on:
+    branch: master
 branches:
   only:
     - master
@@ -31,4 +44,4 @@ notifications:
   email: false
 env:
   global:
-    secure: N1kWzv3MEJnj9rEslsjPUikjnZWjTOabZ9kFol9GLszKDVI2wYxz+uAjXVuhFaRGlgppHr9+2wf9k2RzdOP7m3Z/+h2OFoERyHWCVieRlwt5Ot+9BBEIU7IxRXBhi5QSnz594Iefvf8b66nIIHrtph8WzhyAbTKtuVy0FdPP3d9Bg9gIFNNB/IlcUefUiCQSMZadjL5opIlfeTgDeLMYAJdhZL6vpe4VM10jpAhm7j/XKFZgj1KVG2txbB3urWmuaOysbr+fCzJh73U24NZy3hak05WZlj5gCGUyfyElJPuqHLxxzoGfJ7QOiOTSRB3cR+zwVq7mQF8hKEdnkyQeruXYd7QrgPVVb9/qW6Laz2CZKhNQfmBpmbVZHgZUpAh4WVWLKwkDGRIvj83RWp+Ugchr9+ZEi9gzqOQS4hpWvgsPN0DdUK2jTRRw+3BaHjMYDv8xxc/G4HginjHz5rIYz+/kU94U5DL26o81hLM+gJQ4vx5HsAXh5K5mkyncjjtnuuO1lnu199NL41Rio32lY5doSSlZVpEOozK4kdNs19+cuZ0tdpKkAEZ9uf2ktTKLD0lhsLFncWMm7x6kVDYj6h8Gp79EdAaMI69aOsj5CNH/sg3IVQe6iph/lKzMLTn1TqMP7/8CI39i+jm1W3jIOEBl4S+5S/dOIId/WqJRjok=
+    secure: "N1kWzv3MEJnj9rEslsjPUikjnZWjTOabZ9kFol9GLszKDVI2wYxz+uAjXVuhFaRGlgppHr9+2wf9k2RzdOP7m3Z/+h2OFoERyHWCVieRlwt5Ot+9BBEIU7IxRXBhi5QSnz594Iefvf8b66nIIHrtph8WzhyAbTKtuVy0FdPP3d9Bg9gIFNNB/IlcUefUiCQSMZadjL5opIlfeTgDeLMYAJdhZL6vpe4VM10jpAhm7j/XKFZgj1KVG2txbB3urWmuaOysbr+fCzJh73U24NZy3hak05WZlj5gCGUyfyElJPuqHLxxzoGfJ7QOiOTSRB3cR+zwVq7mQF8hKEdnkyQeruXYd7QrgPVVb9/qW6Laz2CZKhNQfmBpmbVZHgZUpAh4WVWLKwkDGRIvj83RWp+Ugchr9+ZEi9gzqOQS4hpWvgsPN0DdUK2jTRRw+3BaHjMYDv8xxc/G4HginjHz5rIYz+/kU94U5DL26o81hLM+gJQ4vx5HsAXh5K5mkyncjjtnuuO1lnu199NL41Rio32lY5doSSlZVpEOozK4kdNs19+cuZ0tdpKkAEZ9uf2ktTKLD0lhsLFncWMm7x6kVDYj6h8Gp79EdAaMI69aOsj5CNH/sg3IVQe6iph/lKzMLTn1TqMP7/8CI39i+jm1W3jIOEBl4S+5S/dOIId/WqJRjok="
