@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import re
+from collections import OrderedDict
 
 from prichan_items.spiders.utils import create_note_dict
 
@@ -26,6 +27,10 @@ class ItemsSpider(scrapy.Spider):
         for item in name_with_ruby:
             names.append("".join(re.sub("だい|だん|げんてい|きかん|ねん|がつ",
                                         "", item, flags=(re.DOTALL)).split()))  # 正規表現でルビを削除
+        # リストの内容が重複することがあるらしいので削除
+        names = list(OrderedDict.fromkeys(names))
+        series_links = list(OrderedDict.fromkeys(series_links))
+
         # 以下の部分で使わないURLやタイトル部分を手動で弾いている
         delete_list = ["第4弾", "第5弾", "第6弾", "第7弾", "第8弾", "プロモーション", "フォロチケ"]
         delete_url_list = ["index.html", "promotion.html", "ticket.html"]
