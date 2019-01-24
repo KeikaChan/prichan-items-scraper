@@ -7,7 +7,7 @@ before_script:
   - echo 'Asia/Tokyo' | sudo tee /etc/timezone
   - sudo dpkg-reconfigure --frontend noninteractive tzdata
 script:
-  - scrapy crawl items -t csv -o - > ./`date '+%Y_%m_%d'`.csv
+  - scrapy crawl items -t csv -o - > ./items.csv
   - echo https://github.com/KeikaChan/prichan-items-scraper/releases/download/$TRAVIS_JOB_NUMBER/items.csv > items_url
 before_deploy:
   - export TRAVIS_TAG=$TRAVIS_JOB_NUMBER 
@@ -21,7 +21,6 @@ before_deploy:
   - git clone git@github.com:KeikaChan/prichan-items-scraper.git
   - cd ./prichan-items-scraper
   - mv ../items_url ./
-  - mv ../`date '+%Y_%m_%d'`.csv ../items.csv
   - git add items_url
   - git tag -a $TRAVIS_JOB_NUMBER -m "result of $TRAVIS_JOB_NUMBER"
   - git commit -m "Travis Auto Update $TRAVIS_JOB_NUMBER https://travis-ci.org/KeikaChan/prichan-items-scraper/builds/$TRAVIS_BUILD_ID [skip ci]"
